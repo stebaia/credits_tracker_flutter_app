@@ -1,3 +1,4 @@
+import 'package:credits_tracker_flutter_app/blocs/coaches/coaches_bloc.dart';
 import 'package:credits_tracker_flutter_app/blocs/navigation/navigation_cubit.dart';
 import 'package:credits_tracker_flutter_app/blocs/teams/teams_bloc.dart';
 import 'package:credits_tracker_flutter_app/repositories/coaches_repository.dart';
@@ -42,8 +43,8 @@ class App extends StatelessWidget {
                     create: (_) => PlayerService(baseUrl: baseUrl)),
                 Provider<TeamsService>(
                     create: (_) => TeamsService(baseUrl: baseUrl)),
-                Provider<PlayerService>(
-                    create: (_) => PlayerService(baseUrl: baseUrl))
+                Provider<CoachService>(
+                    create: (_) => CoachService(baseUrl: baseUrl))
               ],
               child: MultiRepositoryProvider(
                   providers: [
@@ -64,14 +65,25 @@ class App extends StatelessWidget {
                     providers: [
                       BlocProvider(create: ((context) => NavigationCubit())),
                       BlocProvider(
-                          create: ((context) => PlayersBloc(
-                              playersRepository:
-                                  context.read<PlayersRepository>())
-                            ..fetchPlayers())),
+                        create: ((context) => PlayersBloc(
+                            playersRepository:
+                                context.read<PlayersRepository>())
+                          ..fetchPlayers()),
+                        lazy: false,
+                      ),
                       BlocProvider(
-                          create: ((context) => TeamsBloc(
-                              teamsRepository: context.read<TeamsRepository>())
-                            ..fetchTeams()))
+                        create: ((context) => TeamsBloc(
+                            teamsRepository: context.read<TeamsRepository>())
+                          ..fetchTeams()),
+                        lazy: false,
+                      ),
+                      BlocProvider(
+                        create: ((context) => CoachesBloc(
+                            coachesRepository:
+                                context.read<CoachesRepository>())
+                          ..fetchCoaches()),
+                        lazy: false,
+                      )
                     ],
                     child: MaterialApp(
                         debugShowCheckedModeBanner: false,

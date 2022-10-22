@@ -10,7 +10,7 @@ class CoachesRepository {
 
   CoachesRepository({required this.coachService, required this.coachMapper});
 
-  Future<List<Coach>> players() async {
+  Future<List<Coach>> coaches() async {
     try {
       final response = await coachService.coaches();
       return response.map(coachMapper.toModel).toList(growable: false);
