@@ -10,8 +10,8 @@ import '../../models/team.dart';
 import '../../models/team_player.dart';
 
 class PlayerListPage extends StatelessWidget {
-  const PlayerListPage({Key? key}) : super(key: key);
-
+  const PlayerListPage({Key? key, this.filter}) : super(key: key);
+  final String? filter;
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -25,7 +25,7 @@ class PlayerListPage extends StatelessWidget {
           if (state is FetchedPlayersState) {
             return Container(
                 margin: EdgeInsets.symmetric(horizontal: 4),
-                child: _listWidget(context, players: state.players));
+                child: _listWidget(context, filter, players: state.players));
           } else if (state is ErrorPlayersState) {
             return const Center(
               child: Text('Errore generico'),
@@ -44,16 +44,35 @@ class PlayerListPage extends StatelessWidget {
     );
   }
 
-  Widget _listWidget(BuildContext context, {List<Player> players = const []}) =>
+  Widget _listWidget(BuildContext context, String? filterName,
+          {List<Player> players = const []}) =>
       BlocBuilder<TeamsBloc, TeamsState>(builder: (context, state) {
         if (state is FetchedTeamsState) {
-          return ListView.builder(
-            itemBuilder: (context, index) => playerWidget(
-              players[index],
-              state.teams,
-            ),
-            itemCount: players.length,
-          );
+          if (filterName == null) {
+            return ListView.builder(
+              itemBuilder: (context, index) => playerWidget(
+                players[index],
+                state.teams,
+              ),
+              itemCount: players.length,
+            );
+          } else {
+            List<Player> filteredPlayer = players
+                .where((element) =>
+                    element.firstName!
+                        .toLowerCase()
+                        .contains(filterName.toLowerCase()) ||
+                    element.lastName!
+                        .toLowerCase()
+                        .contains(filterName.toLowerCase()))
+                .toList(growable: false);
+            return ListView.builder(
+                itemBuilder: (context, index) => playerWidget(
+                      filteredPlayer[index],
+                      state.teams,
+                    ),
+                itemCount: filteredPlayer.length);
+          }
         } else if (state is ErrorTeamsState) {
           return const Center(
             child: Text('Errore generico'),

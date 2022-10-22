@@ -6,6 +6,7 @@ import 'package:credits_tracker_flutter_app/ui/screens/enemy_team_page.dart';
 import 'package:credits_tracker_flutter_app/ui/screens/my_team_page.dart';
 import 'package:credits_tracker_flutter_app/ui/screens/player_list_page.dart';
 import 'package:credits_tracker_flutter_app/ui/screens/settings_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -38,7 +39,13 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
           backgroundColor: Color.fromARGB(255, 236, 231, 231),
           appBar: AppBar(
-            actions: [],
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    showSearch(context: context, delegate: MySearchDelegate());
+                  },
+                  icon: Icon(Icons.search))
+            ],
             title: Padding(
                 padding: EdgeInsets.all(4),
                 child: Row(
@@ -173,7 +180,7 @@ class _HomePageState extends State<HomePage> {
             builder: (context, state) {
               return Container(
                   decoration: BoxDecoration(
-                      color: Colors.orange,
+                      color: Color(0xffedd8bb),
                       borderRadius: BorderRadius.circular(20)),
                   margin: EdgeInsets.all(10),
                   child: BottomNavigationBar(
@@ -230,4 +237,32 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
+}
+
+class MySearchDelegate extends SearchDelegate {
+  @override
+  List<Widget>? buildActions(BuildContext context) => [
+        IconButton(
+            onPressed: () {
+              query = '';
+            },
+            icon: Icon(Icons.clear))
+      ];
+
+  @override
+  Widget? buildLeading(BuildContext context) => IconButton(
+      onPressed: () {
+        close(context, null);
+      },
+      icon: Icon(Icons.arrow_back));
+
+  @override
+  Widget buildResults(BuildContext context) => PlayerListPage(
+        filter: query,
+      );
+
+  @override
+  Widget buildSuggestions(BuildContext context) => PlayerListPage(
+        filter: query,
+      );
 }
