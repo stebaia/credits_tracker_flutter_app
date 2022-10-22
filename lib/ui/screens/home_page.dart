@@ -11,13 +11,16 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../blocs/fanta_team/fanta_team_bloc.dart';
 import '../../blocs/navigation/constants/nav_bar_items.dart';
 import '../../blocs/navigation/navigation_cubit.dart';
 import '../../models/player.dart';
 import '../../models/team.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({Key? key, required this.username}) : super(key: key);
+
+  final String username;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -28,95 +31,99 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          actions: [
-            BlocBuilder<NavigationCubit, NavigationState>(
+    return BlocProvider(
+      create: (context) =>
+          FantaTeamBloc(username: widget.username)..fetchFantaTeams(),
+      child: Scaffold(
+          appBar: AppBar(
+            actions: [
+              BlocBuilder<NavigationCubit, NavigationState>(
+                  builder: (context, state) {
+                if (state.index != 3) {
+                  return Container(
+                    child: Center(
+                        child: Text(
+                      'SALVA',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    )),
+                    padding: EdgeInsets.all(8),
+                  );
+                } else {
+                  return Container();
+                }
+              })
+            ],
+            title: BlocBuilder<NavigationCubit, NavigationState>(
                 builder: (context, state) {
-              if (state.index != 3) {
-                return Container(
-                  child: Center(
-                      child: Text(
-                    'SALVA',
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  )),
-                  padding: EdgeInsets.all(8),
-                );
-              } else {
-                return Container();
-              }
-            })
-          ],
-          title: BlocBuilder<NavigationCubit, NavigationState>(
-              builder: (context, state) {
-            return Text(label[state.index]);
-          }),
-        ),
-        bottomNavigationBar: BlocBuilder<NavigationCubit, NavigationState>(
-          builder: (context, state) {
-            return BottomNavigationBar(
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: Colors.orange,
-                selectedItemColor: Colors.white,
-                currentIndex: state.index,
-                showUnselectedLabels: false,
-                items: [
-                  BottomNavigationBarItem(
-                    icon: Icon(
-                      Icons.home,
-                    ),
-                    label: label[0],
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(
-                      Icons.people,
-                    ),
-                    label: label[1],
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(
-                      Icons.person,
-                    ),
-                    label: label[2],
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(
-                      Icons.settings,
-                    ),
-                    label: label[3],
-                  ),
-                ],
-                onTap: (index) {
-                  if (index == 0) {
-                    BlocProvider.of<NavigationCubit>(context)
-                        .getNavBarItem(NavbarItem.home);
-                  } else if (index == 1) {
-                    BlocProvider.of<NavigationCubit>(context)
-                        .getNavBarItem(NavbarItem.enemyTeams);
-                  } else if (index == 2) {
-                    BlocProvider.of<NavigationCubit>(context)
-                        .getNavBarItem(NavbarItem.myTeam);
-                  } else if (index == 3) {
-                    BlocProvider.of<NavigationCubit>(context)
-                        .getNavBarItem(NavbarItem.settings);
-                  }
-                });
-          },
-        ),
-        body: BlocBuilder<NavigationCubit, NavigationState>(
+              return Text(label[state.index]);
+            }),
+          ),
+          bottomNavigationBar: BlocBuilder<NavigationCubit, NavigationState>(
             builder: (context, state) {
-          if (state.navbarItem == NavbarItem.home) {
-            return PlayerListPage();
-          } else if (state.navbarItem == NavbarItem.enemyTeams) {
-            return EnemyTeamPage();
-          } else if (state.navbarItem == NavbarItem.myTeam) {
-            return MyTeamPage();
-          } else if (state.navbarItem == NavbarItem.settings) {
-            return SettingsPage();
-          }
+              return BottomNavigationBar(
+                  type: BottomNavigationBarType.fixed,
+                  backgroundColor: Colors.orange,
+                  selectedItemColor: Colors.white,
+                  currentIndex: state.index,
+                  showUnselectedLabels: false,
+                  items: [
+                    BottomNavigationBarItem(
+                      icon: Icon(
+                        Icons.home,
+                      ),
+                      label: label[0],
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(
+                        Icons.people,
+                      ),
+                      label: label[1],
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(
+                        Icons.person,
+                      ),
+                      label: label[2],
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(
+                        Icons.settings,
+                      ),
+                      label: label[3],
+                    ),
+                  ],
+                  onTap: (index) {
+                    if (index == 0) {
+                      BlocProvider.of<NavigationCubit>(context)
+                          .getNavBarItem(NavbarItem.home);
+                    } else if (index == 1) {
+                      BlocProvider.of<NavigationCubit>(context)
+                          .getNavBarItem(NavbarItem.enemyTeams);
+                    } else if (index == 2) {
+                      BlocProvider.of<NavigationCubit>(context)
+                          .getNavBarItem(NavbarItem.myTeam);
+                    } else if (index == 3) {
+                      BlocProvider.of<NavigationCubit>(context)
+                          .getNavBarItem(NavbarItem.settings);
+                    }
+                  });
+            },
+          ),
+          body: BlocBuilder<NavigationCubit, NavigationState>(
+              builder: (context, state) {
+            if (state.navbarItem == NavbarItem.home) {
+              return PlayerListPage();
+            } else if (state.navbarItem == NavbarItem.enemyTeams) {
+              return EnemyTeamPage();
+            } else if (state.navbarItem == NavbarItem.myTeam) {
+              return MyTeamPage();
+            } else if (state.navbarItem == NavbarItem.settings) {
+              return SettingsPage();
+            }
 
-          return Container();
-        }));
+            return Container();
+          })),
+    );
   }
 }

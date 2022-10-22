@@ -7,11 +7,9 @@ class PlayerMapper extends DTOMapper<PlayerDTO, Player> {
   Player toModel(PlayerDTO dto) => Player(
       firstName: dto.firstName,
       lastName: dto.lastName,
-      temporaryDisplayName: dto.temporaryDisplayName,
       personId: dto.personId,
       teamId: dto.teamId,
       jersey: dto.jersey,
-      isActive: dto.isActive,
       pos: dto.pos);
 
   @override
