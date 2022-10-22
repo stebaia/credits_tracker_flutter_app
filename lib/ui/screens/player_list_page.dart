@@ -23,8 +23,8 @@ class PlayerListPage extends StatelessWidget {
       child: BlocBuilder<PlayersBloc, PlayersState>(
         builder: (context, state) {
           if (state is FetchedPlayersState) {
-            return Padding(
-                padding: EdgeInsets.all(4),
+            return Container(
+                margin: EdgeInsets.symmetric(horizontal: 4),
                 child: _listWidget(context, players: state.players));
           } else if (state is ErrorPlayersState) {
             return const Center(
@@ -48,7 +48,6 @@ class PlayerListPage extends StatelessWidget {
       BlocBuilder<TeamsBloc, TeamsState>(builder: (context, state) {
         if (state is FetchedTeamsState) {
           return ListView.builder(
-            shrinkWrap: true,
             itemBuilder: (context, index) => playerWidget(
               players[index],
               state.teams,
@@ -93,7 +92,7 @@ class PlayerListPage extends StatelessWidget {
                       color: Colors.white, fontWeight: FontWeight.bold),
                 )),
                 decoration: BoxDecoration(
-                    color: Colors.orange,
+                    color: Color.fromARGB(176, 226, 117, 67),
                     borderRadius: BorderRadius.circular(20)),
               ),
               title: Text(

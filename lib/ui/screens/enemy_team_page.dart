@@ -10,13 +10,11 @@ class EnemyTeamPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return ConstrainedBox(
-      constraints: BoxConstraints(minWidth: size.width, maxHeight: size.height),
+    return Container(
       child: BlocBuilder<FantaTeamBloc, FantaTeamState>(
         builder: (context, state) {
           if (state is FetchedFantaTeamState) {
             return ListView.builder(
-                shrinkWrap: true,
                 itemCount: state.fantaTeams.length,
                 itemBuilder: ((context, index) =>
                     Text(state.fantaTeams[index].name)));

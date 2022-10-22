@@ -36,6 +36,7 @@ class _HomePageState extends State<HomePage> {
       create: (context) =>
           FantaTeamBloc(username: widget.username)..fetchFantaTeams(),
       child: Scaffold(
+          backgroundColor: Color.fromARGB(255, 236, 231, 231),
           appBar: AppBar(
             actions: [],
             title: Padding(
@@ -82,7 +83,43 @@ class _HomePageState extends State<HomePage> {
                           }),
                           BlocBuilder<NavigationCubit, NavigationState>(
                               builder: (context, state) {
-                            if (state.index != 3) {
+                            if (state.index == 0) {
+                              return Row(
+                                children: [
+                                  GestureDetector(
+                                    child: Container(
+                                      height: 30,
+                                      width: 30,
+                                      decoration: BoxDecoration(
+                                          color:
+                                              Color.fromARGB(121, 211, 163, 91),
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                      child: Icon(Icons.filter_alt),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Container(
+                                    width: 100,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                        color:
+                                            Color.fromARGB(121, 211, 163, 91),
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    child: Center(
+                                        child: Text(
+                                      'SALVA',
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold),
+                                    )),
+                                  )
+                                ],
+                              );
+                            } else if (state.index == 1 || state.index == 2) {
                               return Container(
                                 width: 100,
                                 height: 30,
@@ -107,73 +144,90 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          floatingActionButton: FloatingActionButton(
-              child: Icon(Icons.filter_alt_outlined), onPressed: (() {})),
-          bottomNavigationBar: BlocBuilder<NavigationCubit, NavigationState>(
-            builder: (context, state) {
-              return BottomNavigationBar(
-                  type: BottomNavigationBarType.fixed,
-                  backgroundColor: Color.fromARGB(255, 236, 224, 209),
-                  selectedItemColor: Colors.black,
-                  currentIndex: state.index,
-                  showUnselectedLabels: false,
-                  items: [
-                    BottomNavigationBarItem(
-                      icon: Icon(
-                        Icons.home,
-                      ),
-                      label: label[0],
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(
-                        Icons.people,
-                      ),
-                      label: label[1],
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(
-                        Icons.person,
-                      ),
-                      label: label[2],
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(
-                        Icons.settings,
-                      ),
-                      label: label[3],
-                    ),
-                  ],
-                  onTap: (index) {
-                    if (index == 0) {
-                      BlocProvider.of<NavigationCubit>(context)
-                          .getNavBarItem(NavbarItem.home);
-                    } else if (index == 1) {
-                      BlocProvider.of<NavigationCubit>(context)
-                          .getNavBarItem(NavbarItem.enemyTeams);
-                    } else if (index == 2) {
-                      BlocProvider.of<NavigationCubit>(context)
-                          .getNavBarItem(NavbarItem.myTeam);
-                    } else if (index == 3) {
-                      BlocProvider.of<NavigationCubit>(context)
-                          .getNavBarItem(NavbarItem.settings);
-                    }
-                  });
-            },
-          ),
           body: BlocBuilder<NavigationCubit, NavigationState>(
               builder: (context, state) {
             if (state.navbarItem == NavbarItem.home) {
-              return PlayerListPage();
+              return generateBodyWithNavigationBar(PlayerListPage());
             } else if (state.navbarItem == NavbarItem.enemyTeams) {
-              return EnemyTeamPage();
+              return generateBodyWithNavigationBar(EnemyTeamPage());
             } else if (state.navbarItem == NavbarItem.myTeam) {
-              return MyTeamPage();
+              return generateBodyWithNavigationBar(MyTeamPage());
             } else if (state.navbarItem == NavbarItem.settings) {
-              return SettingsPage();
+              return generateBodyWithNavigationBar(SettingsPage());
             }
 
             return Container();
           })),
+    );
+  }
+
+  Widget generateBodyWithNavigationBar(Widget child) {
+    return Stack(
+      children: [
+        child,
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: BlocBuilder<NavigationCubit, NavigationState>(
+            builder: (context, state) {
+              return Container(
+                  decoration: BoxDecoration(
+                      color: Colors.orange,
+                      borderRadius: BorderRadius.circular(20)),
+                  margin: EdgeInsets.all(10),
+                  child: BottomNavigationBar(
+                      backgroundColor: Colors.transparent,
+                      type: BottomNavigationBarType.fixed,
+                      selectedItemColor: Colors.black,
+                      currentIndex: state.index,
+                      showSelectedLabels: false,
+                      showUnselectedLabels: false,
+                      items: [
+                        BottomNavigationBarItem(
+                          icon: Icon(
+                            Icons.home,
+                          ),
+                          label: label[0],
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(
+                            Icons.people,
+                          ),
+                          label: label[1],
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(
+                            Icons.person,
+                          ),
+                          label: label[2],
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(
+                            Icons.settings,
+                          ),
+                          label: label[3],
+                        ),
+                      ],
+                      onTap: (index) {
+                        if (index == 0) {
+                          BlocProvider.of<NavigationCubit>(context)
+                              .getNavBarItem(NavbarItem.home);
+                        } else if (index == 1) {
+                          BlocProvider.of<NavigationCubit>(context)
+                              .getNavBarItem(NavbarItem.enemyTeams);
+                        } else if (index == 2) {
+                          BlocProvider.of<NavigationCubit>(context)
+                              .getNavBarItem(NavbarItem.myTeam);
+                        } else if (index == 3) {
+                          BlocProvider.of<NavigationCubit>(context)
+                              .getNavBarItem(NavbarItem.settings);
+                        }
+                      }));
+            },
+          ),
+        )
+      ],
     );
   }
 }
