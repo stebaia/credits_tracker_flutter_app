@@ -37,35 +37,84 @@ class _HomePageState extends State<HomePage> {
           FantaTeamBloc(username: widget.username)..fetchFantaTeams(),
       child: Scaffold(
           appBar: AppBar(
-            actions: [
-              BlocBuilder<NavigationCubit, NavigationState>(
-                  builder: (context, state) {
-                if (state.index != 3) {
-                  return Container(
-                    child: Center(
-                        child: Text(
-                      'SALVA',
+            actions: [],
+            title: Padding(
+                padding: EdgeInsets.all(4),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(30)),
+                      child: Icon(Icons.person),
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      widget.username,
                       style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
+                          color: Colors.black,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 16),
+                    ),
+                  ],
+                )),
+            backgroundColor: Color.fromARGB(255, 236, 224, 209),
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(48.0),
+              child: Theme(
+                data: Theme.of(context).copyWith(accentColor: Colors.orange),
+                child: Container(
+                    height: 48,
+                    alignment: Alignment.center,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          BlocBuilder<NavigationCubit, NavigationState>(
+                              builder: (context, state) {
+                            return Text(
+                              label[state.index],
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 22),
+                            );
+                          }),
+                          BlocBuilder<NavigationCubit, NavigationState>(
+                              builder: (context, state) {
+                            if (state.index != 3) {
+                              return Container(
+                                width: 100,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                    color: Color.fromARGB(121, 211, 163, 91),
+                                    borderRadius: BorderRadius.circular(20)),
+                                child: Center(
+                                    child: Text(
+                                  'SALVA',
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold),
+                                )),
+                              );
+                            } else {
+                              return Container();
+                            }
+                          })
+                        ],
+                      ),
                     )),
-                    padding: EdgeInsets.all(8),
-                  );
-                } else {
-                  return Container();
-                }
-              })
-            ],
-            title: BlocBuilder<NavigationCubit, NavigationState>(
-                builder: (context, state) {
-              return Text(label[state.index]);
-            }),
+              ),
+            ),
           ),
+          floatingActionButton: FloatingActionButton(
+              child: Icon(Icons.filter_alt_outlined), onPressed: (() {})),
           bottomNavigationBar: BlocBuilder<NavigationCubit, NavigationState>(
             builder: (context, state) {
               return BottomNavigationBar(
                   type: BottomNavigationBarType.fixed,
-                  backgroundColor: Colors.orange,
-                  selectedItemColor: Colors.white,
+                  backgroundColor: Color.fromARGB(255, 236, 224, 209),
+                  selectedItemColor: Colors.black,
                   currentIndex: state.index,
                   showUnselectedLabels: false,
                   items: [

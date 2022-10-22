@@ -23,7 +23,9 @@ class PlayerListPage extends StatelessWidget {
       child: BlocBuilder<PlayersBloc, PlayersState>(
         builder: (context, state) {
           if (state is FetchedPlayersState) {
-            return _listWidget(context, players: state.players);
+            return Padding(
+                padding: EdgeInsets.all(4),
+                child: _listWidget(context, players: state.players));
           } else if (state is ErrorPlayersState) {
             return const Center(
               child: Text('Errore generico'),
