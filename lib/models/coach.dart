@@ -1,31 +1,26 @@
-import 'package:equatable/equatable.dart';
+import 'package:credits_tracker_flutter_app/models/nba_person.dart';
 
-class Coach extends Equatable {
-  final String? firstName;
-  final String? lastName;
-  final String? personId;
-  final String? teamId;
+class Coach extends NbaPerson {
+  final bool? isAssistant;
 
   const Coach(
-      {required this.firstName,
-      required this.lastName,
-      required this.personId,
-      required this.teamId});
+      {required super.firstName,
+      required super.lastName,
+      required super.personId,
+      required super.teamId,
+      required this.isAssistant,
+      super.owner}) : super(pos: "HC");
 
-  Coach.fromJson(Map<String, dynamic> map) : this(
-      firstName: map["firstName"],
-      lastName: map["lastName"],
-      personId: map["personId"],
-      teamId: map["teamId"]
-  );
-
-  Map<String, dynamic> toMap() {
-    return {
-      "personId" : personId,
-      "firstName" : firstName,
-      "lastName" : lastName,
-      "teamId" : teamId
-    };
+  @override
+  NbaPerson ownedBy(String newOwner) {
+    return Coach(
+      firstName: firstName,
+      lastName: lastName,
+      personId: personId,
+      teamId: teamId,
+      isAssistant: isAssistant,
+      owner: newOwner
+    );
   }
 
   @override

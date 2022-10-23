@@ -1,39 +1,33 @@
-import 'package:equatable/equatable.dart';
+import 'nba_person.dart';
 
-class Player extends Equatable {
-  final String? firstName;
-  final String? lastName;
-  final String? personId;
-  final String? teamId;
-  final String? jersey;
-  final String? pos;
+class Player extends NbaPerson {
 
   const Player(
-      {required this.firstName,
-      required this.lastName,
-      required this.personId,
-      required this.teamId,
-      required this.jersey,
-      required this.pos});
+      {required super.firstName,
+      required super.lastName,
+      required super.personId,
+      required super.teamId,
+      required super.pos,
+      super.owner});
 
   Player.fromJson(Map<String, dynamic> map) : this(
     firstName: map["firstName"],
     lastName: map["lastName"],
     personId: map["personId"],
     teamId: map["teamId"],
-    jersey: map["jersey"] is int ? map["jersey"] : (map["jersey"] != "" ? int.parse(map["jersey"]) : 0),
     pos: map["pos"]
   );
 
-  Map<String, dynamic> toMap() {
-    return {
-      "personId" : personId,
-      "firstName" : firstName,
-      "lastName" : lastName,
-      "jersey" : jersey,
-      "pos" : pos,
-      "teamId" : teamId
-    };
+  @override
+  NbaPerson ownedBy(String newOwner) {
+    return Player(
+        firstName: firstName,
+        lastName: lastName,
+        personId: personId,
+        teamId: teamId,
+        pos: pos,
+        owner: newOwner
+    );
   }
 
   List<Object?> get props => [
@@ -41,7 +35,6 @@ class Player extends Equatable {
         lastName,
         personId,
         teamId,
-        jersey,
         pos
       ];
 }

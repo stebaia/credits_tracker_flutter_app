@@ -9,7 +9,6 @@ class PlayerMapper extends DTOMapper<PlayerDTO, Player> {
       lastName: dto.lastName,
       personId: dto.personId,
       teamId: dto.teamId,
-      jersey: dto.jersey,
       pos: dto.pos);
 
   @override

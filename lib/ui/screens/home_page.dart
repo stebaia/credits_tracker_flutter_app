@@ -158,7 +158,7 @@ class _HomePageState extends State<HomePage> {
             } else if (state.navbarItem == NavbarItem.enemyTeams) {
               return generateBodyWithNavigationBar(EnemyTeamPage());
             } else if (state.navbarItem == NavbarItem.myTeam) {
-              return generateBodyWithNavigationBar(MyTeamPage());
+              return generateBodyWithNavigationBar(MyTeamPage(coachId: widget.username));
             } else if (state.navbarItem == NavbarItem.settings) {
               return generateBodyWithNavigationBar(SettingsPage());
             }
@@ -240,6 +240,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class MySearchDelegate extends SearchDelegate {
+
   @override
   List<Widget>? buildActions(BuildContext context) => [
         IconButton(

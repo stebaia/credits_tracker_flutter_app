@@ -26,11 +26,11 @@ class CoachesBloc extends Bloc<CoachesEvent, CoachesState> {
 
     try {
       final coaches = await coachesRepository.coaches();
-      emit(coaches.isEmpty ? NoCoachesState() : FetchedPCoachesState(coaches));
+      emit(coaches.isEmpty ? NoCoachesState() : FetchedCoachesState(coaches));
     } on RepositoryError catch (error) {
-      emit(ErrorPlayersState(error.errorMessage));
+      emit(ErrorCoachState(error.errorMessage));
     } catch (error) {
-      emit(const ErrorPlayersState());
+      emit(const ErrorCoachState());
     }
   }
 

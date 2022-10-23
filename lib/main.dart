@@ -1,4 +1,5 @@
 import 'package:credits_tracker_flutter_app/blocs/coaches/coaches_bloc.dart';
+import 'package:credits_tracker_flutter_app/blocs/fanta_team/fanta_team_bloc.dart';
 import 'package:credits_tracker_flutter_app/blocs/navigation/navigation_cubit.dart';
 import 'package:credits_tracker_flutter_app/blocs/teams/teams_bloc.dart';
 import 'package:credits_tracker_flutter_app/repositories/coaches_repository.dart';

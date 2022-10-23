@@ -24,7 +24,6 @@ class FantaTeamBloc extends Bloc<FantaTeamEvent, FantaTeamState> {
   FutureOr<void> _onFetch(
       FetchFantaTeamEvent event, Emitter<FantaTeamState> emitter) async {
     emit(FetchingFantaTeamState());
-    print("VAFFA");
     try {
       NetworkManager.init(username);
       NetworkManager.getFantaTeams().then((value) => emit(FetchedFantaTeamState(value)));

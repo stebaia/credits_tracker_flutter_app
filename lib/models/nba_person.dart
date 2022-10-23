@@ -6,7 +6,7 @@ class NbaPerson extends Equatable {
   final String? personId;
   final String? teamId;
   final String? pos;
-  final bool? isFree;
+  final String? owner;
 
   const NbaPerson(
       {required this.firstName,
@@ -14,7 +14,7 @@ class NbaPerson extends Equatable {
         required this.personId,
         required this.teamId,
         required this.pos,
-        this.isFree});
+        this.owner});
 
   NbaPerson.fromJson(Map<String, dynamic> map) : this(
       firstName: map["firstName"],
@@ -32,6 +32,17 @@ class NbaPerson extends Equatable {
       "pos" : pos,
       "teamId" : teamId
     };
+  }
+
+  NbaPerson ownedBy(String newOwner) {
+    return NbaPerson(
+      firstName: firstName,
+      lastName: lastName,
+      personId: personId,
+      teamId: teamId,
+      pos: pos,
+      owner: newOwner
+    );
   }
 
   List<Object?> get props => [

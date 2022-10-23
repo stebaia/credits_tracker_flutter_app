@@ -8,19 +8,19 @@ abstract class CoachesState extends Equatable {
 
 class FetchingCoachesState extends CoachesState {}
 
-class FetchedPCoachesState extends CoachesState {
+class FetchedCoachesState extends CoachesState {
   final List<Coach> coaches;
-  const FetchedPCoachesState(this.coaches);
+  const FetchedCoachesState(this.coaches);
   @override
   List<Object?> get props => [coaches];
 }
 
 class NoCoachesState extends CoachesState {}
 
-class ErrorPlayersState extends CoachesState {
+class ErrorCoachState extends CoachesState {
   final String? errorMessage;
 
-  const ErrorPlayersState([this.errorMessage]);
+  const ErrorCoachState([this.errorMessage]);
   @override
   List<Object?> get props => [errorMessage];
 }

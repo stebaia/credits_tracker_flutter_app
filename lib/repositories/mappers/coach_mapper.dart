@@ -8,7 +8,9 @@ class CoachMapper extends DTOMapper<CoachDTO, Coach> {
       firstName: dto.firstName,
       lastName: dto.lastName,
       personId: dto.personId,
-      teamId: dto.teamId);
+      teamId: dto.teamId,
+      isAssistant: dto.isAssistant
+  );
 
   @override
   CoachDTO toTrasnferObject(Coach model) {
