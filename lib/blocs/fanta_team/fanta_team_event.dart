@@ -25,6 +25,13 @@ class RemovePlayerAndFetchFantaTeamEvent extends FantaTeamEvent {
   List<Object?> get props => [];
 }
 
+class SpendCreditsAndFetchFantaTeamEvent extends FantaTeamEvent {
+  SpendCreditsAndFetchFantaTeamEvent({required this.credits});
+  final int credits;
+  @override
+  List<Object?> get props => [];
+}
+
 class FetchFantaTeamEvent extends FantaTeamEvent {
   const FetchFantaTeamEvent();
 

@@ -1,12 +1,15 @@
 import 'package:credits_tracker_flutter_app/blocs/teams/teams_bloc.dart';
 import 'package:credits_tracker_flutter_app/models/fanta_team.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 import '../../blocs/fanta_team/fanta_team_bloc.dart';
 import '../../models/nba_person.dart';
 import '../../models/team.dart';
 import '../../models/team_player.dart';
+import '../../provider/dark_theme_provider.dart';
 
 class MyTeamPage extends StatefulWidget {
   const MyTeamPage({Key? key, required this.coachId, this.removed = const []})
@@ -19,6 +22,10 @@ class MyTeamPage extends StatefulWidget {
 }
 
 class _MyTeamState extends State<MyTeamPage> {
+
+  var spendCredits = 0;
+  var txt = TextEditingController();
+
   @override
   void initState() {
     context.read<FantaTeamBloc>().fetchFantaTeams();
@@ -27,6 +34,8 @@ class _MyTeamState extends State<MyTeamPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeChange = Provider.of<DarkThemeProvider>(context);
+    //txt.text = spendCredits.toString();
     return Container(
       child: BlocBuilder<FantaTeamBloc, FantaTeamState>(
         builder: (context, fantateamState) {
@@ -37,21 +46,123 @@ class _MyTeamState extends State<MyTeamPage> {
               FantaTeam myTeam = fantateamState.fantaTeams
                   .firstWhere((t) => t.coachId == widget.coachId);
               myTeam.players.sort(sortNbaPlayers);
-              return ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: myTeam.players.length + 1,
-                  itemBuilder: ((context, index) {
-                    if (index == myTeam.players.length)
-                      return SizedBox(
-                        height: 100,
-                      );
-                    else {
-                      return playerWidget(
-                          myTeam.players[index], teamState.teams, context);
-                    }
-                  }));
+              return Column(
+                  children: [
+                Container(
+                    color: themeChange.darkTheme
+                        ? const Color(0xff171717)
+                        : const Color.fromARGB(255, 236, 231, 231),
+                    height: 50,
+                    width: 400,
+                    alignment: Alignment.center,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Container(
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              width: 150,
+                              height: 46,
+                              child: Center(
+                                  child: Text("Crediti: ${fantateamState.fantaTeams.firstWhere((ft) => ft.coachId == widget.coachId).credits}",
+                                    style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: themeChange.darkTheme
+                                        ? CupertinoColors.white
+                                        : CupertinoColors.black),
+                                  )
+                              )
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              GestureDetector(
+                              child: Container(
+                              height: 30,
+                                width: 30,
+                                decoration: BoxDecoration(
+                                    color: const Color.fromARGB(121, 211, 163, 91),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: IconButton(
+                                  icon: const Icon(Icons.remove),
+                                  padding: const EdgeInsets.all(3),
+                                  onPressed: () {
+                                    spendCredits = spendCredits - 1;
+                                    txt.text = spendCredits.toString();
+                                  }, ))
+                              ),
+                              GestureDetector(
+                                child: Container(
+                                  height: 30,
+                                  width: 30,
+                                  decoration: BoxDecoration(
+                                  color: const Color.fromARGB(121, 211, 163, 91),
+                                  borderRadius: BorderRadius.circular(5)),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.add),
+                                    padding: const EdgeInsets.all(3),
+                                    onPressed: () {
+                                      spendCredits = spendCredits + 1;
+                                      txt.text = spendCredits.toString();
+                                    }, ))
+                              ),
+                              Container(
+                                  margin: const EdgeInsets.symmetric(vertical: 4),
+                                  width: 80,
+                                  height: 46,
+                                  child: Center(
+                                      child: CupertinoTextField(
+                                        placeholder: "Spendi",
+                                        enabled: false,
+                                        controller: txt,
+                                      ),
+                                  )
+                              ),
+                              GestureDetector(
+                                child: Container(
+                                  height: 30,
+                                  width: 30,
+                                  decoration: BoxDecoration(
+                                  color: const Color.fromARGB(121, 211, 163, 91),
+                                  borderRadius: BorderRadius.circular(5)),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.money_off),
+                                    padding: const EdgeInsets.all(3),
+                                    onPressed: () {
+                                      context.read<FantaTeamBloc>().spendCreditsAndFetch(spendCredits);
+                                    }, ))
+                              ),
+                            ],
+                          )
+                          ,
+                        ],
+                      ),
+                    )),
+                Expanded(
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: myTeam.players.length + 1,
+                        itemBuilder: ((context, index) {
+                          if (index == myTeam.players.length) {
+                            return const SizedBox(
+                              height: 100,
+                            );
+                          } else {
+                            return playerWidget(
+                                myTeam.players[index], teamState.teams, context,
+                                themeChange.darkTheme
+                                    ? CupertinoColors.black
+                                    : CupertinoColors.white,
+                                themeChange.darkTheme
+                                    ? CupertinoColors.white
+                                    : const Color.fromARGB(
+                                    228, 24, 29, 58)
+                            );
+                          }
+                        }))
+                ),
+              ]);
             } else {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             }
@@ -62,7 +173,7 @@ class _MyTeamState extends State<MyTeamPage> {
   }
 
   Widget playerWidget(
-      NbaPerson player, List<Team> teams, BuildContext context) {
+      NbaPerson player, List<Team> teams, BuildContext context, Color color, Color titleColor) {
     TeamPlayer teamPlayer;
     if (player.teamId != "") {
       teamPlayer = TeamPlayer(
@@ -90,9 +201,9 @@ class _MyTeamState extends State<MyTeamPage> {
               ),
               title: Text(
                 "${teamPlayer.player.firstName!} ${teamPlayer.player.lastName!}",
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold,),
               ),
-              subtitle: Text("${teamPlayer.team.fullName}"),
+              subtitle: Text("${teamPlayer.team.fullName}",),
             )),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -123,6 +234,6 @@ class _MyTeamState extends State<MyTeamPage> {
   }
 
   int sortNbaPlayers(NbaPerson a, NbaPerson b) {
-    return a.pos == "HC" ? -1 : a.lastName!.compareTo(b.lastName!);
+    return b.pos == "HC" ? 1 : a.lastName!.compareTo(b.lastName!);
   }
 }

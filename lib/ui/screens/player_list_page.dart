@@ -1,6 +1,6 @@
 import 'package:credits_tracker_flutter_app/blocs/coaches/coaches_bloc.dart';
 import 'package:credits_tracker_flutter_app/blocs/fanta_team/fanta_team_bloc.dart';
-import 'package:credits_tracker_flutter_app/services/database/manager.dart';
+import 'package:credits_tracker_flutter_app/utils/filters.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,6 +26,13 @@ class PlayerListPage extends StatefulWidget {
 
 class _PlayerListState extends State<PlayerListPage> {
   TextEditingController controller = TextEditingController(text: '');
+  Map<String, bool> positions = {"G": true, "F": true, "C": true, "HC": true};
+
+  // teamId -> filtered
+  Map<String, bool> teams = {};
+  // teamId -> tricode
+  Map<String, String> tricodes = {};
+
   String filter = "";
   @override
   void initState() {
@@ -36,22 +43,21 @@ class _PlayerListState extends State<PlayerListPage> {
   @override
   Widget build(BuildContext context) {
     final themeChange = Provider.of<DarkThemeProvider>(context);
-    final size = MediaQuery.of(context).size;
     return Column(
       children: [
         Container(
             color: themeChange.darkTheme
-                ? Color(0xff171717)
-                : Color.fromARGB(255, 236, 231, 231),
+                ? const Color(0xff171717)
+                : const Color.fromARGB(255, 236, 231, 231),
             height: 50,
             alignment: Alignment.center,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                      margin: EdgeInsets.symmetric(vertical: 4),
+                      margin: const EdgeInsets.symmetric(vertical: 4),
                       width: 200,
                       height: 46,
                       child: Center(
@@ -69,9 +75,13 @@ class _PlayerListState extends State<PlayerListPage> {
                           height: 30,
                           width: 30,
                           decoration: BoxDecoration(
-                              color: Color.fromARGB(121, 211, 163, 91),
+                              color: const Color.fromARGB(121, 211, 163, 91),
                               borderRadius: BorderRadius.circular(30)),
-                          child: Icon(Icons.filter_alt),
+                          child: IconButton(
+                            padding: const EdgeInsets.all(3),
+                            icon: const Icon(Icons.filter_alt),
+                            onPressed: () => myShowDialog(context, "Filtra", themeChange),
+                          ),
                         ),
                       ),
                     ],
@@ -84,40 +94,49 @@ class _PlayerListState extends State<PlayerListPage> {
             builder: (context, playersState) {
               return BlocBuilder<CoachesBloc, CoachesState>(
                   builder: (context, coachesState) {
-                return BlocBuilder<FantaTeamBloc, FantaTeamState>(
-                    builder: (context, ftState) {
-                  if (playersState is FetchedPlayersState &&
-                      coachesState is FetchedCoachesState &&
-                      ftState is FetchedFantaTeamState) {
-                    return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        child: _listWidget(
-                            themeChange.darkTheme
-                                ? CupertinoColors.white
-                                : CupertinoColors.black,
-                            themeChange.darkTheme
-                                ? Color.fromARGB(228, 24, 29, 58)
-                                : CupertinoColors.white,
-                            filter,
-                            players: playersState.players,
-                            coaches: coachesState.coaches,
-                            fantateams: ftState.fantaTeams));
-                  } else if (playersState is ErrorPlayersState ||
-                      coachesState is ErrorCoachState) {
-                    return const Center(
-                      child: Text('Errore generico'),
-                    );
-                  } else if (playersState is NoPlayersState ||
-                      coachesState is NoCoachesState) {
-                    return const Center(
-                      child: Text('Nessun giocatore trovato'),
-                    );
-                  } else {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                });
+                    return BlocBuilder<TeamsBloc, TeamsState>(
+                      builder: (context, teamsState) {
+                        return BlocBuilder<FantaTeamBloc, FantaTeamState>(
+                          builder: (context, ftState) {
+                            if (playersState is FetchedPlayersState &&
+                                coachesState is FetchedCoachesState &&
+                                ftState is FetchedFantaTeamState &&
+                                teamsState is FetchedTeamsState
+                            ) {
+                              teams = { for (var t in teamsState.teams.where((t) => t.isNBAFranchise!)) t.teamId! : false};
+                              tricodes = { for (var t in teamsState.teams.where((t) => t.isNBAFranchise!)) t.teamId! : t.tricode!};
+                              return Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 4),
+                                  child: _listWidget(
+                                      themeChange.darkTheme
+                                          ? CupertinoColors.white
+                                          : CupertinoColors.black,
+                                      themeChange.darkTheme
+                                          ? const Color.fromARGB(
+                                          228, 24, 29, 58)
+                                          : CupertinoColors.white,
+                                      filter,
+                                      players: playersState.players,
+                                      coaches: coachesState.coaches,
+                                      fantateams: ftState.fantaTeams));
+                            } else if (playersState is ErrorPlayersState ||
+                                coachesState is ErrorCoachState) {
+                              return const Center(
+                                child: Text('Errore generico'),
+                              );
+                            } else if (playersState is NoPlayersState ||
+                                coachesState is NoCoachesState) {
+                              return const Center(
+                                child: Text('Nessun giocatore trovato'),
+                              );
+                            } else {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                          });
+                    });
               });
             },
           ),
@@ -136,6 +155,7 @@ class _PlayerListState extends State<PlayerListPage> {
           completePlayers.addAll(players);
           completePlayers.addAll(coaches.where((c) => !c.isAssistant!));
           completePlayers.sort(sortNbaPlayers);
+          completePlayers = applyFilters(completePlayers, positions, teams);
           completePlayers = completePlayers.map((p) {
             bool owned = fantateams
                 .any((t) => t.players.any((tp) => tp.personId == p.personId));
@@ -286,5 +306,87 @@ class _PlayerListState extends State<PlayerListPage> {
 
   int sortNbaPlayers(NbaPerson a, NbaPerson b) {
     return a.lastName!.compareTo(b.lastName!);
+  }
+
+  void myShowDialog(BuildContext context, String title, DarkThemeProvider themeChange) {
+    final size = MediaQuery.of(context).size;
+    final background = themeChange.darkTheme
+        ? const Color(0xff171717)
+        : const Color.fromARGB(255, 236, 231, 231);
+    final color = themeChange.darkTheme
+        ? const Color.fromARGB(255, 236, 231, 231)
+        : const Color(0xff171717);
+    showDialog(
+        context: context,
+        builder: (context) => StatefulBuilder(
+            builder: (context, stateSetter) => AlertDialog(
+          backgroundColor: background,
+          title: Text(title, style: TextStyle(color: color),),
+          content: Container(
+            padding: EdgeInsets.zero,
+            height: size.height / 1.5,
+            width: size.width / 1.3,
+            child: SizedBox(
+              height: 500,
+              width: 200,
+              child: Row(
+                children: [
+                  SizedBox(
+                    height: size.height / 1.7,
+                    width: size.width / 3.0,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: positions.keys.length,
+                      itemBuilder: ((context, index) => checkboxTilePositions(
+                          positions.keys.toList()[index], color, stateSetter
+                      )))
+                  ),
+                  SizedBox(
+                    height: size.height / 1.7,
+                    width: size.width / 3.0,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: teams.keys.length,
+                      itemBuilder: ((context, index) => checkboxTileTeams(
+                          teams.keys.toList()[index], color, stateSetter
+                      )))
+                  ),
+                ],
+              )
+            )),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => setState(() {
+                Navigator.pop(context);
+              }),
+              child: const Text('Go Back'),
+            ),
+          ],
+        ))
+    );
+  }
+
+  Widget checkboxTilePositions(String k, Color color, Function stateSetter) {
+    return CheckboxListTile(
+      title: Text(k, style: TextStyle(color: color),),
+      value: positions[k],
+      onChanged: (bool? newValue) {
+        stateSetter(() {
+          positions[k] = newValue!;
+        });
+      }
+    );
+  }
+
+  Widget checkboxTileTeams(String k, Color color, Function stateSetter) {
+    return CheckboxListTile(
+        title: Text(tricodes[k]!, style: TextStyle(color: color),),
+        value: teams[k],
+        onChanged: (bool? newValue) {
+          stateSetter(() {
+            teams[k] = newValue!;
+          });
+        }
+    );
   }
 }

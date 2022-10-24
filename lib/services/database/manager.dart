@@ -72,9 +72,9 @@ class NetworkManager {
   /* UPDATE OPERATIONS */
 
   /// Reduces the credits of the specified fanta coach
-  static void spendCredits(String coachId, int amount) async {
+  static Future spendCredits(String coachId, int amount) async {
     var db = await openDb();
-    db.collection(fantaCoachCollection).modernUpdate(
+    return db.collection(fantaCoachCollection).modernUpdate(
         where.eq("$fantacoachesList.id", coachId),
         modify.inc("$fantacoachesList.\$.credits", -amount));
   }

@@ -20,6 +20,7 @@ class FantaTeamBloc extends Bloc<FantaTeamEvent, FantaTeamState> {
     on<FetchFantaTeamEvent>(_onFetch);
     on<AddPlayerAndFetchFantaTeamEvent>(_addPlayerAndFetch);
     on<RemovePlayerAndFetchFantaTeamEvent>(_removePlayerAndFetch);
+    on<SpendCreditsAndFetchFantaTeamEvent>(_spendCreditsAndFetch);
   }
 
   FutureOr<void> _removePlayerAndFetch(RemovePlayerAndFetchFantaTeamEvent event,
@@ -48,6 +49,19 @@ class FantaTeamBloc extends Bloc<FantaTeamEvent, FantaTeamState> {
     }
   }
 
+  FutureOr<void> _spendCreditsAndFetch(SpendCreditsAndFetchFantaTeamEvent event,
+      Emitter<FantaTeamState> emitter) async {
+    emit(FetchingFantaTeamState());
+    try {
+      NetworkManager.init(username);
+      NetworkManager.spendCredits(username, event.credits).then((_) =>
+          NetworkManager.getFantaTeams()
+              .then((value) => emit(FetchedFantaTeamState(value))));
+    } catch (error) {
+      emit(const ErrorFantaTeamState());
+    }
+  }
+
   FutureOr<void> _onFetch(
       FetchFantaTeamEvent event, Emitter<FantaTeamState> emitter) async {
     emit(FetchingFantaTeamState());
@@ -62,6 +76,8 @@ class FantaTeamBloc extends Bloc<FantaTeamEvent, FantaTeamState> {
 
   void removePlayerAndFetch(NbaPerson player) =>
       add(RemovePlayerAndFetchFantaTeamEvent(player: player));
+  void spendCreditsAndFetch(int credits) =>
+      add(SpendCreditsAndFetchFantaTeamEvent(credits: credits));
   void addPlayerAndFetch(NbaPerson player) =>
       add(AddPlayerAndFetchFantaTeamEvent(player: player));
   void fetchFantaTeams() => add(FetchFantaTeamEvent());
