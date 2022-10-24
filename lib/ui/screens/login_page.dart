@@ -1,5 +1,6 @@
 import 'package:credits_tracker_flutter_app/blocs/fanta_team/fanta_team_bloc.dart';
 import 'package:credits_tracker_flutter_app/ui/screens/home_page.dart';
+import 'package:credits_tracker_flutter_app/ui/screens/loading_user_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -98,19 +99,14 @@ class LoginScreen extends StatelessWidget {
                           backgroundColor: Colors.black,
                         ),
                         onPressed: () {
-                          checkAccess(textEditingControllerEmail.text).then((value) {
-                            if (value) {
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: ((context) => HomePage(username: textEditingControllerEmail.text,))),
-                                  ModalRoute.withName('/home'));
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Invalid username"))
-                              );
-                            }
-                          });
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: ((context) => LoadingUserPage(
+                                        username:
+                                            textEditingControllerEmail.text,
+                                      ))),
+                              ModalRoute.withName('/home'));
                         },
                         child: Text("Clicca per loggarti"),
                       )),

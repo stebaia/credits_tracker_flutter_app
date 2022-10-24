@@ -39,117 +39,34 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
           backgroundColor: Color.fromARGB(255, 236, 231, 231),
           appBar: AppBar(
-            actions: [
-              IconButton(
-                  onPressed: () {
-                    showSearch(context: context, delegate: MySearchDelegate());
-                  },
-                  icon: Icon(Icons.search))
-            ],
-            title: Padding(
-                padding: EdgeInsets.all(4),
-                child: Row(
+            title: BlocBuilder<NavigationCubit, NavigationState>(
+                builder: (context, state) {
+              return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                          color: Colors.orange,
-                          borderRadius: BorderRadius.circular(30)),
-                      child: Icon(Icons.person),
-                    ),
-                    SizedBox(width: 10),
                     Text(
-                      widget.username,
+                      label[state.index],
                       style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
                           color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                          fontSize: 16),
+                          fontFamily: 'Poppins'),
                     ),
-                  ],
-                )),
+                    Container(
+                        height: 30,
+                        width: 30,
+                        decoration: BoxDecoration(
+                            color: Colors.orange,
+                            borderRadius: BorderRadius.circular(30)),
+                        child: Center(
+                            child: Text(
+                          widget.username,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 12),
+                        )))
+                  ]);
+            }),
             backgroundColor: Color.fromARGB(255, 236, 224, 209),
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(48.0),
-              child: Theme(
-                data: Theme.of(context).copyWith(accentColor: Colors.orange),
-                child: Container(
-                    height: 48,
-                    alignment: Alignment.center,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          BlocBuilder<NavigationCubit, NavigationState>(
-                              builder: (context, state) {
-                            return Text(
-                              label[state.index],
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 22),
-                            );
-                          }),
-                          BlocBuilder<NavigationCubit, NavigationState>(
-                              builder: (context, state) {
-                            if (state.index == 0) {
-                              return Row(
-                                children: [
-                                  GestureDetector(
-                                    child: Container(
-                                      height: 30,
-                                      width: 30,
-                                      decoration: BoxDecoration(
-                                          color:
-                                              Color.fromARGB(121, 211, 163, 91),
-                                          borderRadius:
-                                              BorderRadius.circular(30)),
-                                      child: Icon(Icons.filter_alt),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Container(
-                                    width: 100,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                        color:
-                                            Color.fromARGB(121, 211, 163, 91),
-                                        borderRadius:
-                                            BorderRadius.circular(20)),
-                                    child: Center(
-                                        child: Text(
-                                      'SALVA',
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
-                                    )),
-                                  )
-                                ],
-                              );
-                            } else if (state.index == 1 || state.index == 2) {
-                              return Container(
-                                width: 100,
-                                height: 30,
-                                decoration: BoxDecoration(
-                                    color: Color.fromARGB(121, 211, 163, 91),
-                                    borderRadius: BorderRadius.circular(20)),
-                                child: Center(
-                                    child: Text(
-                                  'SALVA',
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold),
-                                )),
-                              );
-                            } else {
-                              return Container();
-                            }
-                          })
-                        ],
-                      ),
-                    )),
-              ),
-            ),
           ),
           body: BlocBuilder<NavigationCubit, NavigationState>(
               builder: (context, state) {
@@ -158,7 +75,8 @@ class _HomePageState extends State<HomePage> {
             } else if (state.navbarItem == NavbarItem.enemyTeams) {
               return generateBodyWithNavigationBar(EnemyTeamPage());
             } else if (state.navbarItem == NavbarItem.myTeam) {
-              return generateBodyWithNavigationBar(MyTeamPage(coachId: widget.username));
+              return generateBodyWithNavigationBar(
+                  MyTeamPage(coachId: widget.username));
             } else if (state.navbarItem == NavbarItem.settings) {
               return generateBodyWithNavigationBar(SettingsPage());
             }
@@ -240,7 +158,9 @@ class _HomePageState extends State<HomePage> {
 }
 
 class MySearchDelegate extends SearchDelegate {
+  final String username;
 
+  MySearchDelegate({required this.username, r});
   @override
   List<Widget>? buildActions(BuildContext context) => [
         IconButton(
@@ -258,12 +178,17 @@ class MySearchDelegate extends SearchDelegate {
       icon: Icon(Icons.arrow_back));
 
   @override
-  Widget buildResults(BuildContext context) => PlayerListPage(
+  Widget buildResults(BuildContext context) => BlocProvider(
+      lazy: false,
+      create: (_) => FantaTeamBloc(username: username)..fetchFantaTeams(),
+      child: PlayerListPage(
         filter: query,
-      );
-
+      ));
   @override
-  Widget buildSuggestions(BuildContext context) => PlayerListPage(
+  Widget buildSuggestions(BuildContext context) => BlocProvider(
+      lazy: false,
+      create: (_) => FantaTeamBloc(username: username)..fetchFantaTeams(),
+      child: PlayerListPage(
         filter: query,
-      );
+      ));
 }

@@ -21,7 +21,6 @@ const String fantateamsList = "fantateams";
 /// Contains the principal api of the application.
 /// It is the interface for http requests and database access.
 class NetworkManager {
-
   static String user = "";
 
   static init(String username) {
@@ -56,8 +55,12 @@ class NetworkManager {
   /// Returns all the fanta teams
   static Future<List<FantaTeam>> getFantaTeams() async {
     var db = await openDb();
-    var teams = await db.collection(fantaTeamsCollection).modernFindOne(selector: where.eq(championshipName, championshipNameValue));
-    return (teams![fantateamsList] as List).map((t) => FantaTeam.fromJson(t).also((t) => t.players.sort(sortNbaPlayers))).toList();
+    var teams = await db.collection(fantaTeamsCollection).modernFindOne(
+        selector: where.eq(championshipName, championshipNameValue));
+    return (teams![fantateamsList] as List)
+        .map((t) =>
+            FantaTeam.fromJson(t).also((t) => t.players.sort(sortNbaPlayers)))
+        .toList();
   }
 
   /// Returns the fanta team of the specified fantacoach
@@ -73,26 +76,25 @@ class NetworkManager {
     var db = await openDb();
     db.collection(fantaCoachCollection).modernUpdate(
         where.eq("$fantacoachesList.id", coachId),
-        modify.inc("$fantacoachesList.\$.credits", -amount)
-    );
+        modify.inc("$fantacoachesList.\$.credits", -amount));
   }
 
   /// Adds a player or head coach to the team of the specified fanta coach
-  static void addToTeam(String coachId, NbaPerson p) async {
+  static Future<Map<String, dynamic>> addToTeam(
+      String coachId, NbaPerson p) async {
     var db = await openDb();
-    db.collection(fantaTeamsCollection).modernUpdate(
+    return db.collection(fantaTeamsCollection).modernUpdate(
         where.eq("$fantateamsList.coachId", coachId),
-        modify.push("$fantateamsList.\$.players", p.toMap())
-    );
+        modify.push("$fantateamsList.\$.players", p.toMap()));
   }
 
   /// Removes a player or head coach from the team of the specified fanta coach
-  static void removeFromTeam(String coachId, NbaPerson p) async {
+  static Future<Map<String, dynamic>> removeFromTeam(
+      String coachId, NbaPerson p) async {
     var db = await openDb();
-    db.collection(fantaTeamsCollection).modernUpdate(
+    return db.collection(fantaTeamsCollection).modernUpdate(
         where.eq("$fantateamsList.coachId", coachId),
-        modify.pull("$fantateamsList.\$.players", { "personId" : p.personId })
-    );
+        modify.pull("$fantateamsList.\$.players", {"personId": p.personId}));
   }
 }
 

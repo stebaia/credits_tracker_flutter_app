@@ -20,17 +20,19 @@ class FantaTeam extends Equatable {
       required this.credits,
       required this.players});
 
-  FantaTeam.fromJson(Map<String, dynamic> json) : this(
-      name: json["name"],
-      coachId: json["coachId"],
-      firstName: json["firstName"],
-      lastName: json["lastName"],
-      fullName: "${json["firstName"]} ${json["lastName"]}",
-      credits: int.parse(json["credits"]),
-      players: [for (Map<String, dynamic> p in (json["players"] as List)) NbaPerson.fromJson(p)]
-  );
+  FantaTeam.fromJson(Map<String, dynamic> json)
+      : this(
+            name: json["name"],
+            coachId: json["coachId"],
+            firstName: json["firstName"],
+            lastName: json["lastName"],
+            fullName: "${json["firstName"]} ${json["lastName"]}",
+            credits: int.parse(json["credits"]),
+            players: [
+              for (Map<String, dynamic> p in (json["players"] as List))
+                NbaPerson.fromJson(p)
+            ]);
 
   @override
-  List<Object?> get props =>
-      [name, coachId, players];
+  List<Object?> get props => [name, coachId, players];
 }

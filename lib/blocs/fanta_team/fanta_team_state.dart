@@ -6,9 +6,7 @@ abstract class FantaTeamState extends Equatable {
   List<Object?> get props => [];
 }
 
-class FetchingFantaTeamState extends FantaTeamState {
-
-}
+class FetchingFantaTeamState extends FantaTeamState {}
 
 class FetchedFantaTeamState extends FantaTeamState {
   final List<FantaTeam> fantaTeams;
@@ -26,4 +24,3 @@ class ErrorFantaTeamState extends FantaTeamState {
   @override
   List<Object?> get props => [errorMessage];
 }
-

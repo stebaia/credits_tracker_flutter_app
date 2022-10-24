@@ -1,6 +1,7 @@
 import 'package:credits_tracker_flutter_app/blocs/coaches/coaches_bloc.dart';
 import 'package:credits_tracker_flutter_app/blocs/fanta_team/fanta_team_bloc.dart';
 import 'package:credits_tracker_flutter_app/services/database/manager.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,31 +14,82 @@ import '../../models/player.dart';
 import '../../models/team.dart';
 import '../../models/team_player.dart';
 
-class PlayerListPage extends StatelessWidget {
+class PlayerListPage extends StatefulWidget {
   const PlayerListPage({Key? key, this.filter}) : super(key: key);
+
   final String? filter;
+  @override
+  State<PlayerListPage> createState() => _PlayerListState();
+}
+
+class _PlayerListState extends State<PlayerListPage> {
+  TextEditingController controller = TextEditingController(text: '');
+  String filter = "";
+  @override
+  void initState() {
+    filter = controller.text;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        minHeight: size.height,
-        minWidth: size.width,
-      ),
-      child: BlocBuilder<PlayersBloc, PlayersState>(
-        builder: (context, playersState) {
-          return BlocBuilder<CoachesBloc, CoachesState>(
-            builder: (context, coachesState) {
-              return BlocBuilder<FantaTeamBloc, FantaTeamState>(
-                builder: (context, ftState) {
+    return Column(
+      children: [
+        Container(
+            color: Color(0xffedd8bb),
+            height: 50,
+            alignment: Alignment.center,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                      margin: EdgeInsets.symmetric(vertical: 4),
+                      width: 200,
+                      height: 46,
+                      child: Center(
+                          child: CupertinoTextField(
+                        onChanged: (value) => {
+                          setState(() {
+                            filter = value;
+                          })
+                        },
+                      ))),
+                  Row(
+                    children: [
+                      GestureDetector(
+                        child: Container(
+                          height: 30,
+                          width: 30,
+                          decoration: BoxDecoration(
+                              color: Color.fromARGB(121, 211, 163, 91),
+                              borderRadius: BorderRadius.circular(30)),
+                          child: Icon(Icons.filter_alt),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            )),
+        Expanded(
+          child: BlocBuilder<PlayersBloc, PlayersState>(
+            builder: (context, playersState) {
+              return BlocBuilder<CoachesBloc, CoachesState>(
+                  builder: (context, coachesState) {
+                return BlocBuilder<FantaTeamBloc, FantaTeamState>(
+                    builder: (context, ftState) {
                   if (playersState is FetchedPlayersState &&
                       coachesState is FetchedCoachesState &&
-                      ftState is FetchedFantaTeamState
-                  ) {
+                      ftState is FetchedFantaTeamState) {
                     return Container(
                         margin: const EdgeInsets.symmetric(horizontal: 4),
-                        child: _listWidget(filter, players: playersState.players,
-                            coaches: coachesState.coaches, fantateams: ftState.fantaTeams));
+                        child: _listWidget(filter,
+                            players: playersState.players,
+                            coaches: coachesState.coaches,
+                            fantateams: ftState.fantaTeams));
                   } else if (playersState is ErrorPlayersState ||
                       coachesState is ErrorCoachState) {
                     return const Center(
@@ -53,20 +105,19 @@ class PlayerListPage extends StatelessWidget {
                       child: CircularProgressIndicator(),
                     );
                   }
-                }
-              );
-            }
-          );
-        },
-      ),
+                });
+              });
+            },
+          ),
+        )
+      ],
     );
   }
 
   Widget _listWidget(String? filterName,
           {List<Player> players = const [],
-            List<Coach> coaches = const [],
-            List<FantaTeam> fantateams = const []}
-      ) =>
+          List<Coach> coaches = const [],
+          List<FantaTeam> fantateams = const []}) =>
       BlocBuilder<TeamsBloc, TeamsState>(builder: (context, state) {
         if (state is FetchedTeamsState) {
           List<NbaPerson> completePlayers = [];
@@ -74,13 +125,20 @@ class PlayerListPage extends StatelessWidget {
           completePlayers.addAll(coaches.where((c) => !c.isAssistant!));
           completePlayers.sort(sortNbaPlayers);
           completePlayers = completePlayers.map((p) {
-            bool owned = fantateams.any((t) => t.players.any((tp) => tp.personId == p.personId));
-            return owned ? p.ownedBy(fantateams.firstWhere((t) =>
-                t.players.any((tp) => tp.personId == p.personId)).coachId) : p;
+            bool owned = fantateams
+                .any((t) => t.players.any((tp) => tp.personId == p.personId));
+            return owned
+                ? p.ownedBy(fantateams
+                    .firstWhere(
+                        (t) => t.players.any((tp) => tp.personId == p.personId))
+                    .coachId)
+                : p;
           }).toList();
           if (filterName == null) {
             return ListView(
-              children: completePlayers.map((it) => playerWidget(it, state.teams, fantateams)).toList(),
+              children: completePlayers
+                  .map((it) => playerWidget(it, state.teams, fantateams))
+                  .toList(),
             );
           } else {
             List<NbaPerson> filteredPlayer = completePlayers
@@ -93,7 +151,9 @@ class PlayerListPage extends StatelessWidget {
                         .contains(filterName.toLowerCase()))
                 .toList(growable: false);
             return ListView(
-              children: filteredPlayer.map((it) => playerWidget(it, state.teams, fantateams)).toList(),
+              children: filteredPlayer
+                  .map((it) => playerWidget(it, state.teams, fantateams))
+                  .toList(),
             );
           }
         } else if (state is ErrorTeamsState) {
@@ -111,10 +171,13 @@ class PlayerListPage extends StatelessWidget {
         }
       });
 
-  Widget playerWidget(NbaPerson player, List<Team> teams, List<FantaTeam> fantateams) {
+  Widget playerWidget(
+      NbaPerson player, List<Team> teams, List<FantaTeam> fantateams) {
     TeamPlayer teamPlayer;
     bool free = player.owner == null;
-    String owner = free ? '' : fantateams.firstWhere((ft) => ft.coachId == player.owner!).fullName;
+    String owner = free
+        ? ''
+        : fantateams.firstWhere((ft) => ft.coachId == player.owner!).fullName;
     if (player.teamId != "") {
       teamPlayer = TeamPlayer(
           player: player,
@@ -156,8 +219,7 @@ class PlayerListPage extends StatelessWidget {
                       free ? 'Libero' : 'Occupato: $owner',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: free ? Colors.lightGreen : Colors.redAccent
-                      ),
+                          color: free ? Colors.lightGreen : Colors.redAccent),
                     ),
                   ],
                 ),
@@ -165,9 +227,13 @@ class PlayerListPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     TextButton(
-                      onPressed: !free ? null : () {
-                        NetworkManager.addToTeam(NetworkManager.user, player);
-                      },
+                      onPressed: !free
+                          ? null
+                          : () {
+                              context
+                                  .read<FantaTeamBloc>()
+                                  .addPlayerAndFetch(player);
+                            },
                       child: const Text(
                         'Aggiungi',
                         style: TextStyle(fontWeight: FontWeight.bold),
