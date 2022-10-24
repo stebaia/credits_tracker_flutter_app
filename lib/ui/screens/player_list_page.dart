@@ -4,6 +4,7 @@ import 'package:credits_tracker_flutter_app/services/database/manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 import '../../blocs/players/players_bloc.dart';
 import '../../blocs/teams/teams_bloc.dart';
@@ -13,6 +14,7 @@ import '../../models/nba_person.dart';
 import '../../models/player.dart';
 import '../../models/team.dart';
 import '../../models/team_player.dart';
+import '../../provider/dark_theme_provider.dart';
 
 class PlayerListPage extends StatefulWidget {
   const PlayerListPage({Key? key, this.filter}) : super(key: key);
@@ -33,11 +35,14 @@ class _PlayerListState extends State<PlayerListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeChange = Provider.of<DarkThemeProvider>(context);
     final size = MediaQuery.of(context).size;
     return Column(
       children: [
         Container(
-            color: Color(0xffedd8bb),
+            color: themeChange.darkTheme
+                ? Color(0xff171717)
+                : Color.fromARGB(255, 236, 231, 231),
             height: 50,
             alignment: Alignment.center,
             child: Padding(
@@ -86,7 +91,14 @@ class _PlayerListState extends State<PlayerListPage> {
                       ftState is FetchedFantaTeamState) {
                     return Container(
                         margin: const EdgeInsets.symmetric(horizontal: 4),
-                        child: _listWidget(filter,
+                        child: _listWidget(
+                            themeChange.darkTheme
+                                ? CupertinoColors.white
+                                : CupertinoColors.black,
+                            themeChange.darkTheme
+                                ? Color.fromARGB(228, 24, 29, 58)
+                                : CupertinoColors.white,
+                            filter,
                             players: playersState.players,
                             coaches: coachesState.coaches,
                             fantateams: ftState.fantaTeams));
@@ -114,7 +126,7 @@ class _PlayerListState extends State<PlayerListPage> {
     );
   }
 
-  Widget _listWidget(String? filterName,
+  Widget _listWidget(Color titleColor, Color color, String? filterName,
           {List<Player> players = const [],
           List<Coach> coaches = const [],
           List<FantaTeam> fantateams = const []}) =>
@@ -137,7 +149,13 @@ class _PlayerListState extends State<PlayerListPage> {
           if (filterName == null) {
             return ListView(
               children: completePlayers
-                  .map((it) => playerWidget(it, state.teams, fantateams))
+                  .map((it) => playerWidget(
+                        it,
+                        state.teams,
+                        fantateams,
+                        color,
+                        titleColor,
+                      ))
                   .toList(),
             );
           } else {
@@ -152,7 +170,13 @@ class _PlayerListState extends State<PlayerListPage> {
                 .toList(growable: false);
             return ListView(
               children: filteredPlayer
-                  .map((it) => playerWidget(it, state.teams, fantateams))
+                  .map((it) => playerWidget(
+                        it,
+                        state.teams,
+                        fantateams,
+                        color,
+                        titleColor,
+                      ))
                   .toList(),
             );
           }
@@ -172,7 +196,12 @@ class _PlayerListState extends State<PlayerListPage> {
       });
 
   Widget playerWidget(
-      NbaPerson player, List<Team> teams, List<FantaTeam> fantateams) {
+    NbaPerson player,
+    List<Team> teams,
+    List<FantaTeam> fantateams,
+    Color color,
+    Color titleColor,
+  ) {
     TeamPlayer teamPlayer;
     bool free = player.owner == null;
     String owner = free
@@ -184,6 +213,7 @@ class _PlayerListState extends State<PlayerListPage> {
           team:
               teams.where((element) => element.teamId == player.teamId).first);
       return Card(
+          color: color,
           elevation: 6,
           child: Column(children: [
             Container(
@@ -204,9 +234,13 @@ class _PlayerListState extends State<PlayerListPage> {
               ),
               title: Text(
                 "${teamPlayer.player.firstName!} ${teamPlayer.player.lastName!}",
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: titleColor),
               ),
-              subtitle: Text("${teamPlayer.team.fullName}"),
+              subtitle: Text(
+                "${teamPlayer.team.fullName}",
+                style: TextStyle(color: titleColor),
+              ),
             )),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

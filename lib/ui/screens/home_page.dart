@@ -11,12 +11,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 import '../../blocs/fanta_team/fanta_team_bloc.dart';
 import '../../blocs/navigation/constants/nav_bar_items.dart';
 import '../../blocs/navigation/navigation_cubit.dart';
 import '../../models/player.dart';
 import '../../models/team.dart';
+import '../../provider/dark_theme_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.username}) : super(key: key);
@@ -32,12 +34,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeChange = Provider.of<DarkThemeProvider>(context);
     return BlocProvider(
       lazy: false,
       create: (context) =>
           FantaTeamBloc(username: widget.username)..fetchFantaTeams(),
       child: Scaffold(
-          backgroundColor: Color.fromARGB(255, 236, 231, 231),
+          backgroundColor: themeChange.darkTheme
+              ? Color(0xff171717)
+              : Color.fromARGB(255, 236, 231, 231),
           appBar: AppBar(
             title: BlocBuilder<NavigationCubit, NavigationState>(
                 builder: (context, state) {
@@ -49,7 +54,9 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 22,
-                          color: Colors.black,
+                          color: themeChange.darkTheme
+                              ? CupertinoColors.white
+                              : CupertinoColors.black,
                           fontFamily: 'Poppins'),
                     ),
                     Container(
@@ -66,19 +73,39 @@ class _HomePageState extends State<HomePage> {
                         )))
                   ]);
             }),
-            backgroundColor: Color.fromARGB(255, 236, 224, 209),
+            backgroundColor:
+                themeChange.darkTheme ? Colors.black : Color(0xffedd8bb),
           ),
           body: BlocBuilder<NavigationCubit, NavigationState>(
               builder: (context, state) {
             if (state.navbarItem == NavbarItem.home) {
-              return generateBodyWithNavigationBar(PlayerListPage());
+              return generateBodyWithNavigationBar(
+                  PlayerListPage(),
+                  themeChange.darkTheme ? Colors.black : Color(0xffedd8bb),
+                  themeChange.darkTheme
+                      ? CupertinoColors.white
+                      : CupertinoColors.black);
             } else if (state.navbarItem == NavbarItem.enemyTeams) {
-              return generateBodyWithNavigationBar(EnemyTeamPage());
+              return generateBodyWithNavigationBar(
+                  EnemyTeamPage(),
+                  themeChange.darkTheme ? Colors.black : Color(0xffedd8bb),
+                  themeChange.darkTheme
+                      ? CupertinoColors.white
+                      : CupertinoColors.black);
             } else if (state.navbarItem == NavbarItem.myTeam) {
               return generateBodyWithNavigationBar(
-                  MyTeamPage(coachId: widget.username));
+                  MyTeamPage(coachId: widget.username),
+                  themeChange.darkTheme ? Colors.black : Color(0xffedd8bb),
+                  themeChange.darkTheme
+                      ? CupertinoColors.white
+                      : CupertinoColors.black);
             } else if (state.navbarItem == NavbarItem.settings) {
-              return generateBodyWithNavigationBar(SettingsPage());
+              return generateBodyWithNavigationBar(
+                  SettingsPage(),
+                  themeChange.darkTheme ? Colors.black : Color(0xffedd8bb),
+                  themeChange.darkTheme
+                      ? CupertinoColors.white
+                      : CupertinoColors.black);
             }
 
             return Container();
@@ -86,7 +113,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget generateBodyWithNavigationBar(Widget child) {
+  Widget generateBodyWithNavigationBar(
+      Widget child, Color colorNavbar, Color colorIcon) {
     return Stack(
       children: [
         child,
@@ -98,13 +126,14 @@ class _HomePageState extends State<HomePage> {
             builder: (context, state) {
               return Container(
                   decoration: BoxDecoration(
-                      color: Color(0xffedd8bb),
+                      color: colorNavbar,
                       borderRadius: BorderRadius.circular(20)),
                   margin: EdgeInsets.all(10),
                   child: BottomNavigationBar(
                       backgroundColor: Colors.transparent,
                       type: BottomNavigationBarType.fixed,
-                      selectedItemColor: Colors.black,
+                      selectedItemColor: colorIcon,
+                      unselectedItemColor: Colors.grey,
                       currentIndex: state.index,
                       showSelectedLabels: false,
                       showUnselectedLabels: false,

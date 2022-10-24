@@ -1,11 +1,14 @@
 import 'package:credits_tracker_flutter_app/blocs/fanta_team/fanta_team_bloc.dart';
 import 'package:credits_tracker_flutter_app/ui/screens/home_page.dart';
 import 'package:credits_tracker_flutter_app/ui/screens/loading_user_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
+import '../../provider/dark_theme_provider.dart';
 import '../../services/database/db.dart';
 import '../../utils/bezier_container.dart';
 
@@ -15,6 +18,7 @@ class LoginScreen extends StatelessWidget {
   TextEditingController textEditingControllerPassword = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final themeChange = Provider.of<DarkThemeProvider>(context);
     Widget _entryField(String title, TextEditingController controller,
         {bool isPassword = false}) {
       return Container(
@@ -47,7 +51,7 @@ class LoginScreen extends StatelessWidget {
       BuildContext buildContext,
     ) {}
 
-    Widget _title() {
+    Widget _title(Color titleColor) {
       return RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
@@ -59,7 +63,7 @@ class LoginScreen extends StatelessWidget {
               TextSpan(
                 text: 'Dunkest',
                 style: TextStyle(
-                    color: Colors.black, fontSize: 30, fontFamily: 'Poppins'),
+                    color: titleColor, fontSize: 30, fontFamily: 'Poppins'),
               ),
               TextSpan(
                 text: 'Tracker',
@@ -71,7 +75,9 @@ class LoginScreen extends StatelessWidget {
     }
 
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: themeChange.darkTheme
+            ? CupertinoColors.black
+            : CupertinoColors.white,
         body: Container(
             child: Stack(
           children: [
@@ -85,7 +91,11 @@ class LoginScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _title(),
+                  _title(
+                    themeChange.darkTheme
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
+                  ),
                   SizedBox(
                     height: 20,
                   ),

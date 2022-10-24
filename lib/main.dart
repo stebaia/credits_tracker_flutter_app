@@ -2,6 +2,7 @@ import 'package:credits_tracker_flutter_app/blocs/coaches/coaches_bloc.dart';
 import 'package:credits_tracker_flutter_app/blocs/fanta_team/fanta_team_bloc.dart';
 import 'package:credits_tracker_flutter_app/blocs/navigation/navigation_cubit.dart';
 import 'package:credits_tracker_flutter_app/blocs/teams/teams_bloc.dart';
+import 'package:credits_tracker_flutter_app/provider/dark_theme_provider.dart';
 import 'package:credits_tracker_flutter_app/repositories/coaches_repository.dart';
 import 'package:credits_tracker_flutter_app/repositories/mappers/coach_mapper.dart';
 import 'package:credits_tracker_flutter_app/repositories/mappers/player_mapper.dart';
@@ -21,15 +22,35 @@ import 'ui/screens/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const App());
+  runApp(App());
 }
 
-class App extends StatelessWidget {
-  const App({super.key});
+class App extends StatefulWidget {
+  App({super.key});
+  @override
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<App> {
   static String baseUrl = "data.nba.net";
+  DarkThemeProvider themeProvider = new DarkThemeProvider();
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentAppTheme();
+  }
+
+  void getCurrentAppTheme() async {
+    themeProvider.darkTheme =
+        await themeProvider.darkThemePreferences.getTheme();
+  }
+
   @override
   Widget build(BuildContext context) => MultiProvider(
           providers: [
+            ChangeNotifierProvider<DarkThemeProvider>(
+                create: (_) => themeProvider),
             Provider<PlayerMapper>(
               create: (_) => PlayerMapper(),
             ),

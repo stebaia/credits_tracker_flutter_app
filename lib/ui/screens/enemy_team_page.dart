@@ -5,12 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+
+import '../../provider/dark_theme_provider.dart';
 
 class EnemyTeamPage extends StatelessWidget {
   const EnemyTeamPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final themeChange = Provider.of<DarkThemeProvider>(context);
     final size = MediaQuery.of(context).size;
     return Container(
       child: BlocBuilder<FantaTeamBloc, FantaTeamState>(
@@ -26,7 +30,15 @@ class EnemyTeamPage extends StatelessWidget {
                           scrollDirection: Axis.horizontal,
                           itemCount: state.fantaTeams.length,
                           itemBuilder: ((context, index) => containerPlayer(
-                              state.fantaTeams[index], context)))))
+                                state.fantaTeams[index],
+                                context,
+                                themeChange.darkTheme
+                                    ? Color(0xff171717)
+                                    : Color.fromARGB(255, 236, 231, 231),
+                                themeChange.darkTheme
+                                    ? Color.fromARGB(255, 236, 231, 231)
+                                    : Color(0xff171717),
+                              )))))
             ]);
           } else {
             return Text('Error');
@@ -36,7 +48,8 @@ class EnemyTeamPage extends StatelessWidget {
     );
   }
 
-  Widget containerPlayer(FantaTeam fantaTeam, BuildContext context) {
+  Widget containerPlayer(FantaTeam fantaTeam, BuildContext context,
+      Color background, Color textColor) {
     return Container(
         margin: EdgeInsets.all(10),
         decoration: BoxDecoration(boxShadow: [
@@ -45,7 +58,7 @@ class EnemyTeamPage extends StatelessWidget {
             offset: Offset(0.0, 0.6), //(x,y)
             blurRadius: 10.0,
           ),
-        ], color: Colors.white, borderRadius: BorderRadius.circular(20)),
+        ], color: background, borderRadius: BorderRadius.circular(20)),
         width: 300,
         height: 200,
         child: Column(children: [
@@ -57,12 +70,18 @@ class EnemyTeamPage extends StatelessWidget {
             children: [
               Text(
                 fantaTeam.coachId,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: textColor),
               ),
               SizedBox(
                 width: 20,
               ),
-              Text("${fantaTeam.credits} crediti")
+              Text(
+                "${fantaTeam.credits} crediti",
+                style: TextStyle(color: textColor),
+              )
             ],
           ),
           ListView.builder(
@@ -75,7 +94,8 @@ class EnemyTeamPage extends StatelessWidget {
                   margin: EdgeInsets.all(6),
                   padding: EdgeInsets.all(8),
                   child: Text(
-                      "${fantaTeam.players[index].firstName} ${fantaTeam.players[index].lastName}")))),
+                    "${fantaTeam.players[index].firstName} ${fantaTeam.players[index].lastName}",
+                  )))),
         ]));
   }
 }
