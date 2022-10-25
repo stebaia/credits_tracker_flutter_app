@@ -26,7 +26,12 @@ class PlayerListPage extends StatefulWidget {
 
 class _PlayerListState extends State<PlayerListPage> {
   TextEditingController controller = TextEditingController(text: '');
-  Map<String, bool> positions = {"G": false, "F": false, "C": false, "HC": false};
+  Map<String, bool> positions = {
+    "G": false,
+    "F": false,
+    "C": false,
+    "HC": false
+  };
 
   // teamId -> filtered
   Map<String, bool> teams = {};
@@ -61,6 +66,11 @@ class _PlayerListState extends State<PlayerListPage> {
                       height: 46,
                       child: Center(
                           child: CupertinoTextField(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6),
+                            color: themeChange.darkTheme
+                                ? Colors.black
+                                : Colors.white),
                         onChanged: (value) => {
                           setState(() {
                             filter = value;
