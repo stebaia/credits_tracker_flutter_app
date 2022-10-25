@@ -74,9 +74,9 @@ class NetworkManager {
   /// Reduces the credits of the specified fanta coach
   static Future spendCredits(String coachId, int amount) async {
     var db = await openDb();
-    return db.collection(fantaCoachCollection).modernUpdate(
-        where.eq("$fantacoachesList.id", coachId),
-        modify.inc("$fantacoachesList.\$.credits", -amount));
+    return db.collection(fantaTeamsCollection).modernUpdate(
+        where.eq("$fantateamsList.coachId", coachId),
+        modify.inc("$fantateamsList.\$.credits", -amount));
   }
 
   /// Adds a player or head coach to the team of the specified fanta coach

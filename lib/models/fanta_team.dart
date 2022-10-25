@@ -27,7 +27,7 @@ class FantaTeam extends Equatable {
             firstName: json["firstName"],
             lastName: json["lastName"],
             fullName: "${json["firstName"]} ${json["lastName"]}",
-            credits: int.parse(json["credits"]),
+            credits: json["credits"],
             players: [
               for (Map<String, dynamic> p in (json["players"] as List))
                 NbaPerson.fromJson(p)
