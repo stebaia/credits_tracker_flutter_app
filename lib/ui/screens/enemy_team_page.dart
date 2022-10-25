@@ -21,27 +21,30 @@ class EnemyTeamPage extends StatelessWidget {
         builder: (context, state) {
           return BlocBuilder<TeamsBloc, TeamsState>(
             builder: (teamsContext, teamState) {
-              if (state is FetchedFantaTeamState && teamState is FetchedTeamsState) {
+              if (state is FetchedFantaTeamState &&
+                  teamState is FetchedTeamsState) {
                 return CustomScrollView(slivers: [
                   SliverToBoxAdapter(
                       child: SizedBox(
-                          height: 550,
+                          height: 600,
                           child: ListView.builder(
                               shrinkWrap: true,
                               itemExtent: size.width * 0.8,
                               scrollDirection: Axis.horizontal,
                               itemCount: state.fantaTeams.length,
                               itemBuilder: ((context, index) => containerPlayer(
-                                state.fantaTeams[index],
-                                teamState.teams,
-                                context,
-                                themeChange.darkTheme
-                                    ? const Color(0xff171717)
-                                    : const Color.fromARGB(255, 236, 231, 231),
-                                themeChange.darkTheme
-                                    ? const Color.fromARGB(255, 236, 231, 231)
-                                    : const Color(0xff171717),
-                              )))))
+                                    state.fantaTeams[index],
+                                    teamState.teams,
+                                    context,
+                                    themeChange.darkTheme
+                                        ? const Color(0xff171717)
+                                        : const Color.fromARGB(
+                                            255, 236, 231, 231),
+                                    themeChange.darkTheme
+                                        ? const Color.fromARGB(
+                                            255, 236, 231, 231)
+                                        : const Color(0xff171717),
+                                  )))))
                 ]);
               } else {
                 return const Text('Error');
@@ -53,8 +56,8 @@ class EnemyTeamPage extends StatelessWidget {
     );
   }
 
-  Widget containerPlayer(FantaTeam fantaTeam, List<Team> teams, BuildContext context,
-      Color background, Color textColor) {
+  Widget containerPlayer(FantaTeam fantaTeam, List<Team> teams,
+      BuildContext context, Color background, Color textColor) {
     fantaTeam.players.sort(sortNbaPlayers);
     return Container(
         margin: const EdgeInsets.all(10),
@@ -81,7 +84,7 @@ class EnemyTeamPage extends StatelessWidget {
                 fantaTeam.fullName,
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 20,
+                    fontSize: 16,
                     color: textColor),
               ),
               const SizedBox(
@@ -96,6 +99,9 @@ class EnemyTeamPage extends StatelessWidget {
               )
             ],
           ),
+          SizedBox(
+            height: 6,
+          ),
           ListView.builder(
               shrinkWrap: true,
               itemCount: fantaTeam.players.length,
@@ -103,7 +109,8 @@ class EnemyTeamPage extends StatelessWidget {
                   decoration: BoxDecoration(
                       color: Colors.orange,
                       borderRadius: BorderRadius.circular(20)),
-                  margin: const EdgeInsets.only(left: 6.0, top: 4.0, right: 6.0, bottom: 4.0),
+                  margin: const EdgeInsets.only(
+                      left: 6.0, top: 4.0, right: 6.0, bottom: 4.0),
                   padding: const EdgeInsets.all(8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -112,17 +119,16 @@ class EnemyTeamPage extends StatelessWidget {
                           flex: 4,
                           child: Text(
                             "${fantaTeam.players[index].firstName} ${fantaTeam.players[index].lastName}",
-                          )
-                      ),
+                          )),
                       Expanded(
                           flex: 1,
-                          child: Center(child: Text("${fantaTeam.players[index].pos}"))
-                      ),
+                          child: Center(
+                              child: Text("${fantaTeam.players[index].pos}"))),
                       Expanded(
                           flex: 1,
-                          child: Center(child: Text("${teams.firstWhere((t) => t.teamId == fantaTeam.players[index].teamId).tricode}"))
-                      ),
-
+                          child: Center(
+                              child: Text(
+                                  "${teams.firstWhere((t) => t.teamId == fantaTeam.players[index].teamId).tricode}"))),
                     ],
                   )))),
         ]));

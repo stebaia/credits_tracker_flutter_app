@@ -46,9 +46,8 @@ class _PlayerListState extends State<PlayerListPage> {
     return Column(
       children: [
         Container(
-            color: themeChange.darkTheme
-                ? const Color(0xff171717)
-                : const Color.fromARGB(255, 236, 231, 231),
+            color:
+                themeChange.darkTheme ? Color(0xff140b00) : Color(0xffeed1a7),
             height: 50,
             alignment: Alignment.center,
             child: Padding(
@@ -80,7 +79,8 @@ class _PlayerListState extends State<PlayerListPage> {
                           child: IconButton(
                             padding: const EdgeInsets.all(3),
                             icon: const Icon(Icons.filter_alt),
-                            onPressed: () => myShowDialog(context, "Filtra", themeChange),
+                            onPressed: () =>
+                                myShowDialog(context, "Filtra", themeChange),
                           ),
                         ),
                       ),
@@ -94,49 +94,54 @@ class _PlayerListState extends State<PlayerListPage> {
             builder: (context, playersState) {
               return BlocBuilder<CoachesBloc, CoachesState>(
                   builder: (context, coachesState) {
-                    return BlocBuilder<TeamsBloc, TeamsState>(
-                      builder: (context, teamsState) {
-                        return BlocBuilder<FantaTeamBloc, FantaTeamState>(
-                          builder: (context, ftState) {
-                            if (playersState is FetchedPlayersState &&
-                                coachesState is FetchedCoachesState &&
-                                ftState is FetchedFantaTeamState &&
-                                teamsState is FetchedTeamsState
-                            ) {
-                              teams = { for (var t in teamsState.teams.where((t) => t.isNBAFranchise!)) t.teamId! : false};
-                              tricodes = { for (var t in teamsState.teams.where((t) => t.isNBAFranchise!)) t.teamId! : t.tricode!};
-                              return Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 4),
-                                  child: _listWidget(
-                                      themeChange.darkTheme
-                                          ? CupertinoColors.white
-                                          : CupertinoColors.black,
-                                      themeChange.darkTheme
-                                          ? const Color.fromARGB(
-                                          228, 24, 29, 58)
-                                          : CupertinoColors.white,
-                                      filter,
-                                      players: playersState.players,
-                                      coaches: coachesState.coaches,
-                                      fantateams: ftState.fantaTeams));
-                            } else if (playersState is ErrorPlayersState ||
-                                coachesState is ErrorCoachState) {
-                              return const Center(
-                                child: Text('Errore generico'),
-                              );
-                            } else if (playersState is NoPlayersState ||
-                                coachesState is NoCoachesState) {
-                              return const Center(
-                                child: Text('Nessun giocatore trovato'),
-                              );
-                            } else {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            }
-                          });
-                    });
+                return BlocBuilder<TeamsBloc, TeamsState>(
+                    builder: (context, teamsState) {
+                  return BlocBuilder<FantaTeamBloc, FantaTeamState>(
+                      builder: (context, ftState) {
+                    if (playersState is FetchedPlayersState &&
+                        coachesState is FetchedCoachesState &&
+                        ftState is FetchedFantaTeamState &&
+                        teamsState is FetchedTeamsState) {
+                      teams = {
+                        for (var t
+                            in teamsState.teams.where((t) => t.isNBAFranchise!))
+                          t.teamId!: false
+                      };
+                      tricodes = {
+                        for (var t
+                            in teamsState.teams.where((t) => t.isNBAFranchise!))
+                          t.teamId!: t.tricode!
+                      };
+                      return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          child: _listWidget(
+                              themeChange.darkTheme
+                                  ? CupertinoColors.white
+                                  : CupertinoColors.black,
+                              themeChange.darkTheme
+                                  ? const Color.fromARGB(228, 24, 29, 58)
+                                  : CupertinoColors.white,
+                              filter,
+                              players: playersState.players,
+                              coaches: coachesState.coaches,
+                              fantateams: ftState.fantaTeams));
+                    } else if (playersState is ErrorPlayersState ||
+                        coachesState is ErrorCoachState) {
+                      return const Center(
+                        child: Text('Errore generico'),
+                      );
+                    } else if (playersState is NoPlayersState ||
+                        coachesState is NoCoachesState) {
+                      return const Center(
+                        child: Text('Nessun giocatore trovato'),
+                      );
+                    } else {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  });
+                });
               });
             },
           ),
@@ -308,7 +313,8 @@ class _PlayerListState extends State<PlayerListPage> {
     return a.lastName!.compareTo(b.lastName!);
   }
 
-  void myShowDialog(BuildContext context, String title, DarkThemeProvider themeChange) {
+  void myShowDialog(
+      BuildContext context, String title, DarkThemeProvider themeChange) {
     final size = MediaQuery.of(context).size;
     final background = themeChange.darkTheme
         ? const Color(0xff171717)
@@ -320,73 +326,80 @@ class _PlayerListState extends State<PlayerListPage> {
         context: context,
         builder: (context) => StatefulBuilder(
             builder: (context, stateSetter) => AlertDialog(
-          backgroundColor: background,
-          title: Text(title, style: TextStyle(color: color),),
-          content: Container(
-            padding: EdgeInsets.zero,
-            height: size.height / 1.5,
-            width: size.width / 1.3,
-            child: SizedBox(
-              height: 500,
-              width: 200,
-              child: Row(
-                children: [
-                  SizedBox(
-                    height: size.height / 1.7,
-                    width: size.width / 3.0,
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: positions.keys.length,
-                      itemBuilder: ((context, index) => checkboxTilePositions(
-                          positions.keys.toList()[index], color, stateSetter
-                      )))
+                  backgroundColor: background,
+                  title: Text(
+                    title,
+                    style: TextStyle(color: color),
                   ),
-                  SizedBox(
-                    height: size.height / 1.7,
-                    width: size.width / 3.0,
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: teams.keys.length,
-                      itemBuilder: ((context, index) => checkboxTileTeams(
-                          teams.keys.toList()[index], color, stateSetter
-                      )))
-                  ),
-                ],
-              )
-            )),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => setState(() {
-                Navigator.pop(context);
-              }),
-              child: const Text('Go Back'),
-            ),
-          ],
-        ))
-    );
+                  content: Container(
+                      padding: EdgeInsets.zero,
+                      height: size.height / 1.5,
+                      width: size.width / 1.3,
+                      child: SizedBox(
+                          height: 500,
+                          width: 200,
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                  height: size.height / 1.7,
+                                  width: size.width / 3.0,
+                                  child: ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: positions.keys.length,
+                                      itemBuilder: ((context, index) =>
+                                          checkboxTilePositions(
+                                              positions.keys.toList()[index],
+                                              color,
+                                              stateSetter)))),
+                              SizedBox(
+                                  height: size.height / 1.7,
+                                  width: size.width / 3.0,
+                                  child: ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: teams.keys.length,
+                                      itemBuilder: ((context, index) =>
+                                          checkboxTileTeams(
+                                              teams.keys.toList()[index],
+                                              color,
+                                              stateSetter)))),
+                            ],
+                          ))),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => setState(() {
+                        Navigator.pop(context);
+                      }),
+                      child: const Text('Go Back'),
+                    ),
+                  ],
+                )));
   }
 
   Widget checkboxTilePositions(String k, Color color, Function stateSetter) {
     return CheckboxListTile(
-      title: Text(k, style: TextStyle(color: color),),
-      value: positions[k],
-      onChanged: (bool? newValue) {
-        stateSetter(() {
-          positions[k] = newValue!;
+        title: Text(
+          k,
+          style: TextStyle(color: color),
+        ),
+        value: positions[k],
+        onChanged: (bool? newValue) {
+          stateSetter(() {
+            positions[k] = newValue!;
+          });
         });
-      }
-    );
   }
 
   Widget checkboxTileTeams(String k, Color color, Function stateSetter) {
     return CheckboxListTile(
-        title: Text(tricodes[k]!, style: TextStyle(color: color),),
+        title: Text(
+          tricodes[k]!,
+          style: TextStyle(color: color),
+        ),
         value: teams[k],
         onChanged: (bool? newValue) {
           stateSetter(() {
             teams[k] = newValue!;
           });
-        }
-    );
+        });
   }
 }
