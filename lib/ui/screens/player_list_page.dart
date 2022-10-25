@@ -26,7 +26,7 @@ class PlayerListPage extends StatefulWidget {
 
 class _PlayerListState extends State<PlayerListPage> {
   TextEditingController controller = TextEditingController(text: '');
-  Map<String, bool> positions = {"G": true, "F": true, "C": true, "HC": true};
+  Map<String, bool> positions = {"G": false, "F": false, "C": false, "HC": false};
 
   // teamId -> filtered
   Map<String, bool> teams = {};

@@ -12,7 +12,8 @@ List<NbaPerson> applyFilters(
 }
 
 bool filterByPosition(NbaPerson p, Map<String, bool> positions) {
-  return p.pos!.contains(RegExp(positions.keys
+  return (!positions.values.reduce((acc, e) => acc || e))
+      || p.pos!.contains(RegExp(positions.keys
       .where((k) => positions[k]!)
       .reduce((acc, s) => "$acc|$s")));
 }
