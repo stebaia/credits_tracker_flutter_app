@@ -119,6 +119,12 @@ class _MyTeamState extends State<MyTeamPage> {
                                   height: 46,
                                   child: Center(
                                     child: CupertinoTextField(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          color: themeChange.darkTheme
+                                              ? Colors.black
+                                              : Colors.white),
                                       placeholder: "Spendi",
                                       enabled: true,
                                       controller: txt,
