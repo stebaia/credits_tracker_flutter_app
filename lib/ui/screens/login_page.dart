@@ -28,7 +28,9 @@ class LoginScreen extends StatelessWidget {
               children: <Widget>[
                 Text(
                   title,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color:   themeChange.darkTheme
+                                ? Colors.white
+                                : Colors.black),
                 ),
                 SizedBox(
                   height: 10,

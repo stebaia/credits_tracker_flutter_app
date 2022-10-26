@@ -66,6 +66,9 @@ class _PlayerListState extends State<PlayerListPage> {
                       height: 46,
                       child: Center(
                           child: CupertinoTextField(
+                            style: TextStyle(color: themeChange.darkTheme
+                                ? Colors.white
+                                : Colors.black),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(6),
                             color: themeChange.darkTheme

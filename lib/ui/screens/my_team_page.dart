@@ -119,6 +119,9 @@ class _MyTeamState extends State<MyTeamPage> {
                                   height: 46,
                                   child: Center(
                                     child: CupertinoTextField(
+                                      style: TextStyle(color: themeChange.darkTheme
+                                ? Colors.white
+                                : Colors.black),
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(6),
